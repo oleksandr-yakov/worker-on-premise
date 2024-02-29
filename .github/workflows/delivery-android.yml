@@ -22,7 +22,7 @@ jobs:
 
       - name: Set Environment Variable ENV
         run: |
-          if [ ${{ github.ref }}" == "refs/heads/main" ]; then
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
             echo "CORE_TAG=latest" >> $GITHUB_ENV
             echo "INFO --- [   trigger   ] : triggered for push main"
           elif [ "${{ env.CORE_TAG }}" == "latest" ]; then
