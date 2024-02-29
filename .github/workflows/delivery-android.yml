@@ -1,0 +1,63 @@
+name: Print Tag
+
+on:
+  push:
+    branches: [ main, dev ]
+  workflow_dispatch:
+    inputs:
+      new_core_tag:
+        description: 'New variable for the action'
+        required: false
+
+env:
+  CORE_TAG: ${{ github.event.inputs.new_core_tag }}
+  TAG_MANIFEST: latest
+
+jobs:
+  print_tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Set Environment Variable ENV
+        run: |
+          if [ ${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "CORE_TAG=latest" >> $GITHUB_ENV
+            echo "INFO --- [   trigger   ] : triggered for push main"
+          elif [ "${{ env.CORE_TAG }}" == "latest" ]; then
+            echo "INFO --- [   trigger   ] : triggered for push main from core"
+          elif [ "$(python3 GetTag.py --check_tag ${{ env.CORE_TAG }})" == "True" ]; then
+            echo "CORE_TAG=$(python3 GetTag.py --get_max_tag ${{ secrets.GET_TAG }})" >> $GITHUB_ENV 
+            echo "TAG_MANIFEST=$(python3 GetTag.py --get_onp_tag ${{ secrets.GET_TAG }})" >> $GITHUB_ENV
+            echo "INFO --- [   trigger   ] : triggered by new tag core"
+          else
+            echo "ERROR --- [   trigger   ] : Wrong Tag. Use v4763.4313.765; v1.14.6"
+            echo "Your Tag is: ${{ env.CORE_TAG }}"
+            exit 1
+          fi  
+
+      - name: Set Environment Variable ENV
+        run: |
+          if [ "$(python3 GetTag.py --check_tag ${{ env.CORE_TAG }})" == "True" ]; then
+            echo "ENV=prod" >> $GITHUB_ENV
+            echo "INFO --- [   trigger   ] : triggered by new tag core"
+          elif [ "${{ github.ref }}" == "refs/heads/dev" ] || [ "${{ env.CORE_TAG }}" == "latest" ]; then
+            echo "CORE_TAG=latest" >> $GITHUB_ENV
+            echo "ENV=dev" >> $GITHUB_ENV
+            echo "INFO --- [   trigger   ] : triggered for push dev or <latest> tag from core"
+          elif [ "${{ github.ref }}" == "refs/heads/main" ] && [ "$(python3 GetTag.py --check_tag ${{ env.CORE_TAG }})" != "False" ]; then
+            echo "ENV=prod" >> $GITHUB_ENV
+            echo "CORE_TAG=$(python3 GetTag.py --get_max_tag ${{ secrets.GET_TAG }})" >> $GITHUB_ENV   
+            echo "INFO --- [   trigger   ] : triggered for push main"
+          else
+            echo "ERROR --- [   trigger   ] : Wrong Tag. Use v4763.4313.765; v1.14.6"
+            echo "Your Tag is: ${{ env.CORE_TAG }}"
+            exit 1
+          fi          
+
+      - name: Print All Useful data
+        run: |
+          echo "ENV: ${{ env.ENV }}"
+          echo "CORE_TAG: ${{ env.CORE_TAG }}"
+          echo "TAG_MANIFEST: ${{ env.TAG_MANIFEST }}"
