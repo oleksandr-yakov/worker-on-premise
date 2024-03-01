@@ -89,7 +89,7 @@ def main():
                                                                                  "4.3.2.7")
     parser.add_argument("--create_tag_worker", action="store_true", help="Create new tag for worker using tag "
                                                                          " max tag core and new tag worker")
-    parser.add_argument("--core_repo", metavar="REPO", type=str, help="GitHub Core_*repository name '")
+    parser.add_argument("--core_repo", metavar="CORE_REPO", type=str, help="GitHub Core_*repository name '")
     parser.add_argument("--token", metavar="TOKEN", type=str, help="GitHub personal access token")
     parser.add_argument("--core_tag", metavar="CORE_TAG", type=str, help="Tag from core_*")
     parser.add_argument("--worker_tag", metavar="WORKER_TAG", type=str, help="Tag from worker")
@@ -103,9 +103,9 @@ def main():
         is_valid = check_tag(args.check_tag)
         print(is_valid)
     elif args.get_max_tag:
-        if not args.repo or not args.token:
-            parser.error("--get_max_tag requires --repo and --token.")
-        repo_name = OWNER + args.repo
+        if not args.core_repo or not args.token:
+            parser.error("--get_max_tag requires --core_repo and --token.")
+        repo_name = OWNER + args.core_repo
         max_tag = find_max_tag(repo_name, args.token)
         print(max_tag)
     elif args.create_tag_worker_by_core:
@@ -117,7 +117,7 @@ def main():
         print(tag_manifest)
     elif args.create_tag_worker:
         if not args.token:
-            parser.error("--create_tag_worker requires --repo --core_tag and --token.")
+            parser.error("--create_tag_worker requires --core_repo --core_tag and --token.")
         core_tag = find_max_tag(OWNER + args.core_repo, args.token)
         manifest_tag = create_tag_manifest(args.worker_tag, core_tag)
         print(manifest_tag)
