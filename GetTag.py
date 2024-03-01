@@ -120,7 +120,7 @@ def main():
         print(tag_manifest)
     elif args.create_tag_manifest:
         if not args.token:
-            parser.error("--create_tag_manifest requires --core_repo --core_tag and --token.")
+            parser.error("--create_tag_manifest requires --core_repo --worker_tag and --token.")
         core_tag = find_max_tag(OWNER + args.core_repo, args.token)
         manifest_tag = create_tag_manifest(args.worker_tag, core_tag)
         print(manifest_tag)
