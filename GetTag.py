@@ -113,7 +113,7 @@ def main():
             parser.error("--create_tag_worker_by_core requires --core_tag and --token.")
         worker_tag = find_max_tag(OWNER + WORKER_REPO, args.token)
         tag_manifest = create_tag_manifest("0.0.0.0", args.core_tag)
-        git_tag_worker(args.token, tag_manifest)
+        #git_tag_worker(args.token, tag_manifest)
         print(tag_manifest)
     elif args.create_tag_worker:
         if not args.token:
