@@ -53,3 +53,4 @@ jobs:
           if [ "${GITHUB_REF##*/}" != "main" ] && [ "${GITHUB_REF##*/}" != *0 ]; then
             python3 GetTag.py --update_tag_worker --token ${{ secrets.GET_TAG }} --core_tag ${{ env.CORE_TAG }}
             echo "INFO --- [   trigger   ] : tag worker updated"
+          fi
