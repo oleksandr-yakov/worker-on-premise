@@ -47,7 +47,7 @@ jobs:
         run: |
           echo "Dockerfile use CORE_TAG: ${{ env.CORE_TAG }}"
           echo "Push to ECR with TAG_MANIFEST: ${{ env.TAG_MANIFEST }}"
-          echo "GITHUB_REF: ${GITHUB_REF##*/})"
+          echo "GITHUB_REF: ${GITHUB_REF##*/}"
           
 
       - name: After Push update tag worker
