@@ -25,10 +25,10 @@ jobs:
       - name: Set Environment Variable ENV
         run: |
           if [ "$(python3 GetTag.py --check_tag ${{ env.CORE_TAG }})" == "True" ]; then
-            echo "TAG_MANIFEST=$(python3 GetTag.py --create_tag_worker_by_core --token ${{ secrets.GET_TAG }}) --core_tag ${{ env.CORE_TAG }})" >> $GITHUB_ENV
+            echo "TAG_MANIFEST=$(python3 GetTag.py --create_tag_worker_by_core --token ${{ secrets.GET_TAG }} --core_tag ${{ env.CORE_TAG }})" >> $GITHUB_ENV
             echo "INFO --- [   trigger   ] : triggered by new tag core"
           elif [ "${GITHUB_REF##*/}" != "main" ]; then
-            echo "TAG_MANIFEST=$(python3 GetTag.py --create_tag_worker --token ${{ secrets.GET_TAG }}) --core_tag ${{ env.CORE_TAG }})" >> $GITHUB_ENV
+            echo "TAG_MANIFEST=$(python3 GetTag.py --create_tag_worker --token ${{ secrets.GET_TAG }} --core_tag ${{ env.CORE_TAG }})" >> $GITHUB_ENV
             echo "INFO --- [   trigger   ] : triggered by new worker tag "
           elif [ "${{ github.ref }}" == "refs/heads/main" ] && [ "$(python3 GetTag.py --check_tag ${{ env.CORE_TAG }})" != "False" ]; then
             echo "CORE_TAG=latest" >> $GITHUB_ENV
