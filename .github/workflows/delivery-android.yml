@@ -30,10 +30,12 @@ jobs:
           elif [ "${GITHUB_REF##*/}" != "main" ]; then
             echo "TAG_MANIFEST=$(python3 GetTag.py --create_tag_worker --token ${{ secrets.GET_TAG }}) --core_tag ${{ env.CORE_TAG }})" >> $GITHUB_ENV
             echo "INFO --- [   trigger   ] : triggered by new worker tag "
-          elif [ "${{ github.ref }}" == "refs/heads/main" ] || [ "${{ env.CORE_TAG }}" == "latest" ]; then
+          elif [ "${{ github.ref }}" == "refs/heads/main" ] && [ "$(python3 GetTag.py --check_tag ${{ env.CORE_TAG }})" != "False" ]; then
             echo "CORE_TAG=latest" >> $GITHUB_ENV
-            echo "INFO --- [   trigger   ] : triggered for push main OR triggered for push main from core"    
-          
+            echo "INFO --- [   trigger   ] : triggered for push main"    
+          elif [ "${{ env.CORE_TAG }}" == "latest" ]; then
+            echo "CORE_TAG=latest" >> $GITHUB_ENV
+            echo "INFO --- [   trigger   ] : triggered for push main from core"          
           else
             echo "ERROR --- [   trigger   ] : Wrong Tag. Use v4763.4313.765; v1.14.6"
             echo "Your Tag is: ${{ env.CORE_TAG }}"
