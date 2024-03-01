@@ -47,10 +47,12 @@ jobs:
         run: |
           echo "Dockerfile use CORE_TAG: ${{ env.CORE_TAG }}"
           echo "Push to ECR with TAG_MANIFEST: ${{ env.TAG_MANIFEST }}"
+          echo "GITHUB_REF: ${GITHUB_REF##*/})"
+          
 
       - name: After Push update tag worker
         run: |
-          if [ "${GITHUB_REF##*/}" != "main" ] && [ "${GITHUB_REF##*/}" != *0 ]; then
+          if [ "$(python3 GetTag.py --check_tag ${{ env.CORE_TAG }})" == "True" ]; then
             python3 GetTag.py --update_tag_worker --token ${{ secrets.GET_TAG }} --core_tag ${{ env.CORE_TAG }}
             echo "INFO --- [   trigger   ] : tag worker updated"
           fi
