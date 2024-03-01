@@ -2,6 +2,7 @@ import argparse
 import requests
 import re
 import json
+
 OWNER = "oleksandr-yakov/"
 WORKER_REPO = "worker-on-premise"
 
@@ -59,8 +60,7 @@ def get_latest_commit_sha(token):
         return None
 
 
-def git_tag_worker(token, worker_tag,):
-
+def git_tag_worker(token, worker_tag, ):
     url = f"https://api.github.com/repos/{OWNER}{WORKER_REPO}/git/refs"
     headers = {
         "Authorization": f"token {token}",
@@ -84,15 +84,20 @@ def main():
     parser.add_argument("--check_tag", metavar="TAG", type=str, nargs='?', const='', help="Check if a tag follows the "
                                                                                           "format v#.#.#")
     parser.add_argument("--get_max_tag", action="store_true", help="Find the maximum tag on a GitHub repository")
-    parser.add_argument("--create_tag_worker_by_core", action="store_true", help="Create tag for worker using tag "
-                                                                                 "core 4.3.2 and tag worker 4.0.0.7 => "
-                                                                                 "4.3.2.7")
-    parser.add_argument("--create_tag_worker", action="store_true", help="Create new tag for worker using tag "
+    parser.add_argument("--create_tag_manifest_by_core", action="store_true", help="Create tag for worker using tag "
+                                                                                   "core 4.3.2 and tag worker"
+                                                                                   "4.0.0.7 "
+                                                                                   "=>"
+                                                                                   "4.3.2.7")
+    parser.add_argument("--create_tag_manifest", action="store_true", help="Create new tag for worker using tag "
+                                                                           " max tag core and new tag worker")
+    parser.add_argument("--update_tag_worker", action="store_true", help="Update old tag for worker using tag "
                                                                          " max tag core and new tag worker")
-    parser.add_argument("--core_repo", metavar="CORE_REPO", type=str, help="GitHub Core_*repository name '")
+    parser.add_argument("--core_repo", metavar="CORE_REPO", type=str, help="GitHub Core_*repository name'")
     parser.add_argument("--token", metavar="TOKEN", type=str, help="GitHub personal access token")
     parser.add_argument("--core_tag", metavar="CORE_TAG", type=str, help="Tag from core_*")
     parser.add_argument("--worker_tag", metavar="WORKER_TAG", type=str, help="Tag from worker")
+    parser.add_argument("--manifest_tag", metavar="MANIFEST_TAG", type=str, help="main manifest Tag")
 
     args = parser.parse_args()
 
@@ -108,19 +113,21 @@ def main():
         repo_name = OWNER + args.core_repo
         max_tag = find_max_tag(repo_name, args.token)
         print(max_tag)
-    elif args.create_tag_worker_by_core:
+    elif args.create_tag_manifest_by_core:
         if not args.token:
-            parser.error("--create_tag_worker_by_core requires --core_tag and --token.")
-        worker_tag = find_max_tag(OWNER + WORKER_REPO, args.token)
+            parser.error("--create_tag_manifest_by_core requires --core_tag and --token.")
         tag_manifest = create_tag_manifest("0.0.0.0", args.core_tag)
-        #git_tag_worker(args.token, tag_manifest)
         print(tag_manifest)
-    elif args.create_tag_worker:
+    elif args.create_tag_manifest:
         if not args.token:
-            parser.error("--create_tag_worker requires --core_repo --core_tag and --token.")
+            parser.error("--create_tag_manifest requires --core_repo --core_tag and --token.")
         core_tag = find_max_tag(OWNER + args.core_repo, args.token)
         manifest_tag = create_tag_manifest(args.worker_tag, core_tag)
         print(manifest_tag)
+    elif args.update_tag_worker:
+        if not args.token:
+            parser.error("--update_tag_worker requires --manifest_tag --core_tag and --token.")
+        git_tag_worker(args.token, args.manifest_tag)
     else:
         parser.print_help()
 
